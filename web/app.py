@@ -43,5 +43,52 @@ class Register(Resource):
         }
         return make_response(jsonify(retJson), 200)
 
+#Storing the Sentence in DB
+class Store(Resource):
+    def post(self):
+        users = get_db()
+        #Step 1: Get the posted data
+        postedData = request.get_json()
+
+        #Step 2: Read the Data from the request
+        username = postedData["username"]
+        password = postedData["password"]
+        sentence = postedData["sentence"]
+
+        #Step 3: Verify the username and password
+        correctpw = verifyPW(username,password) # Need to define the function
+        if not correctpw:
+            retJson = {
+                "Message" : "Something is not correct!"
+            }
+            return make_response(jsonify(retJson), 302)
+        
+        #Step 4: Check the number of tokens
+        num_tokens = countTokens(username) # Need to define the function
+        if num_tokens <=0:
+            retJson = {
+                "Message" : "No Tokens left!"
+            }
+            return make_response(jsonify(retJson), 301)
+        
+        #Step 5: Add the sentence to the database
+        users.update_one(
+            {
+                "Username" : username
+            },
+            {"$set":{
+                "Sentence": sentence,
+                "Tokens" : num_tokens-1
+            }}
+        )
+        retJson = {
+                "Message" : "Sentence Saved Successfully!"
+            }
+        return make_response(jsonify(retJson), 200)
+
+
+
+
+
 
         
