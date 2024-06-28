@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
 
 # Define the Docker image to be used for the job
 image: python:3.8
@@ -19,3 +20,12 @@ build:
   artifacts:
     paths:
       - .venv/
+
+#Test Stage using PyTest
+test:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - source .venv/bin/activate
+    - pytest
