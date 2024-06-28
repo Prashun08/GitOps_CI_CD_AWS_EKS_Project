@@ -1,0 +1,21 @@
+stages:
+  - build
+
+# Define the image to be used for the job
+image: python:3.8
+
+# Cache dependencies to speed up builds
+cache:
+  paths:
+    - .venv/
+
+# Build stage
+build:
+  stage: build
+  script:
+    - python -m venv .venv
+    - source .venv/bin/activate
+    - pip install -r web/requirements.txt
+  artifacts:
+    paths:
+      - .venv/
