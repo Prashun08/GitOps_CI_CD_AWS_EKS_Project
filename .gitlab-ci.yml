@@ -1,7 +1,7 @@
 stages:
   - build
 
-# Define the image to be used for the job
+# Define the Docker image to be used for the job
 image: python:3.8
 
 # Cache dependencies to speed up builds
