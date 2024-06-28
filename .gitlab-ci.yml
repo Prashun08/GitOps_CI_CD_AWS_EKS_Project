@@ -9,7 +9,7 @@ cache:
   paths:
     - .venv/
 
-# Build stage
+# Build stage for Flask WebApp
 build:
   stage: build
   script:
