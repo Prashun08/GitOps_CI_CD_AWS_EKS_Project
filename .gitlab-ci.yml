@@ -59,6 +59,8 @@ docker_build:
   script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
     - docker compose build --no-cache
+    - docker tag prashun08/web prashun08/web:"$CI_PIPELINE_IID"
+    - docker tag prashun08/db prashun08/db:"$CI_PIPELINE_IID"
     - docker push prashun08/web:"$CI_PIPELINE_IID"
     - docker push prashun08/db:"$CI_PIPELINE_IID"
 
