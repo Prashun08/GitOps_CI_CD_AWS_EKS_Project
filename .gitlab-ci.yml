@@ -2,6 +2,7 @@ stages:
   - build
   - test
   - sonartest
+  - docker
 
 # Define the Docker image to be used for the job
 image: python:3.8
@@ -48,8 +49,17 @@ sonartest:
       - .sonar/cache
   script:
     - sonar-scanner
-  only:
-    - merge_requests
-    - main
-    - develop
+
+# Docker build and push stage
+docker_build:
+  stage: docker
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker compose build .
+    - docker push prashun08/web:"$CI_PIPELINE_IID"
+    - docker push prashun08/db:"$CI_PIPELINE_IID"
+
 
