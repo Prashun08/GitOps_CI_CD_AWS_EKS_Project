@@ -58,7 +58,7 @@ docker_build:
     - docker:dind
   script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-    - docker compose build .
+    - docker compose build --no-cache
     - docker push prashun08/web:"$CI_PIPELINE_IID"
     - docker push prashun08/db:"$CI_PIPELINE_IID"
 
