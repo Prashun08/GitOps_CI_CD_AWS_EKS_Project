@@ -1,6 +1,7 @@
 #Importing Libraries
 from flask import Flask, jsonify, request, make_response
 from flask_restful import Api, Resource
+import os
 from pymongo import MongoClient
 import bcrypt
 
@@ -16,7 +17,8 @@ Num_of_Users = None
 def get_db():
     global client, db, Users
     if client is None:
-        client = MongoClient("mongodb://db:27017")
+        mongo_uri = os.getenv("MONGO_URI", "mongodb://db:27017")
+        client = MongoClient(mongo_uri)
         db = client.SentenceDB
         Users = db["Users"]
     return Users
