@@ -3,6 +3,7 @@ stages:
   - test
   - sonartest
   - docker
+  - terraform_apply
 
 # Define the Docker image to be used for the job
 image: python:3.8
@@ -63,5 +64,17 @@ docker_build:
     - docker tag prashun08/db prashun08/db:"$CI_PIPELINE_IID"
     - docker push prashun08/web:"$CI_PIPELINE_IID"
     - docker push prashun08/db:"$CI_PIPELINE_IID"
+
+# Terraform apply stage
+terraform_apply:
+  stage: terraform_apply
+  image: hashicorp/terraform:latest
+  before_script:
+    - terraform --version
+  script:
+    - terraform init
+    - terraform apply -auto-approve
+  dependencies:
+    - docker_build
 
 

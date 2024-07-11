@@ -2,7 +2,7 @@
 resource "aws_eks_cluster" "eks_cluster" {
   name     = "eks-prod"
   role_arn = aws_iam_role.eks_master_role.arn
-  version  = "1.28"
+  version  = "1.29"
 
   vpc_config {
     subnet_ids              = module.vpc.public_subnets
