@@ -72,9 +72,63 @@ terraform_apply:
   before_script:
     - terraform --version
   script:
+    - cd Terraform
     - terraform init
     - terraform apply -auto-approve
+  artifacts:
+    paths:
+      - terraform.tfstate
+      - terraform.tfstate.backup
+      - .terraform/
+      - .terraform.lock.hcl
   dependencies:
     - docker_build
+
+# Deploy stage
+deploy:
+  stage: deploy
+  image: amazon/aws-cli:latest
+  before_script:
+    # Configure AWS CLI with your credentials
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+
+    # Install kubectl
+    - curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
+
+    # Get EKS cluster details and configure kubectl
+    - aws eks update-kubeconfig --name eks-prod --region us-east-1
+
+  script:
+    - kubectl apply -f kube-manifests/mongo-deployment.yaml
+    - kubectl apply -f kube-manifests/mongo-service.yaml
+    - kubectl apply -f kube-manifests/flask-deployment.yaml
+    - kubectl apply -f kube-manifests/flask-service.yaml
+    - kubectl get svc flask-service
+  dependencies:
+    - terraform_apply
+
+# Cleanup stage
+cleanup:
+  stage: cleanup
+  image: hashicorp/terraform:latest
+  before_script:
+    - terraform --version
+  script:
+    - sleep 600  # Wait for 10 Mins
+    - terraform destroy -auto-approve
+  artifacts:
+    paths:
+      - terraform.tfstate
+      - terraform.tfstate.backup
+      - .terraform/
+      - .terraform.lock.hcl
+  dependencies:
+    - terraform_apply
+  when: delayed
+  start_in: 10 minutes
+
 
 
