@@ -4,6 +4,8 @@ stages:
   - sonartest
   - docker
   - terraform_apply
+  - deploy
+  - cleanup
 
 # Define the Docker image to be used for the job
 image: python:3.8
