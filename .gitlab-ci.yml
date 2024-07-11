@@ -71,8 +71,6 @@ docker_build:
 terraform_apply:
   stage: terraform_apply
   image: hashicorp/terraform:latest
-  before_script:
-    - terraform --version
   script:
     - cd Terraform
     - terraform init
