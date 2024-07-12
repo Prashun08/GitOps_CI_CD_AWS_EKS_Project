@@ -77,7 +77,7 @@ docker_build:
 terraform_apply:
   stage: terraform_apply
   image: 
-    name: hashicorp/terraform:light
+    name: hashicorp/terraform:latest
     entrypoint: [""]
   before_script:
   - terraform --version
@@ -124,7 +124,7 @@ deploy:
 cleanup:
   stage: cleanup
   image: 
-    name: hashicorp/terraform:light
+    name: hashicorp/terraform:latest
     entrypoint: [""]
   script:
     - sleep 600  # Wait for 10 Mins
