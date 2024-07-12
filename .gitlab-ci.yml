@@ -77,11 +77,12 @@ docker_build:
 terraform_apply:
   stage: terraform_apply
   image: hashicorp/terraform:latest
-  script:
+  before_script:
   - terraform --version
   - export GITLAB_ACCESS_TOKEN=$TOKEN
   - cd ${TF_DIR}
   - terraform init  -reconfigure -backend-config="address=${ADDRESS}" -backend-config="lock_address=${ADDRESS}/lock" -backend-config="unlock_address=${ADDRESS}/lock" -backend-config="username=<UseName>" -backend-config="password=$GITLAB_ACCESS_TOKEN" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
+  script:
   - terraform apply -auto-approve
   cache:
     key: ${CI_COMMIT_REF_NAME}
