@@ -10,6 +10,12 @@ stages:
 # Define the Docker image to be used for the job
 image: python:3.8
 
+variables:
+  TF_DIR: ${CI_PROJECT_DIR}/Terraform
+  STATE_NAME: "EKS-tf"
+  ADDRESS: "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/terraform/state/${STATE_NAME}"
+
+
 # Cache dependencies to speed up builds
 cache:
   paths:
@@ -72,17 +78,15 @@ terraform_apply:
   stage: terraform_apply
   image: hashicorp/terraform:latest
   script:
-    - cd Terraform
-    - terraform init
-    - terraform apply -auto-approve
-  artifacts:
+  - terraform --version
+  - export GITLAB_ACCESS_TOKEN=$TOKEN
+  - cd ${TF_DIR}
+  - terraform init  -reconfigure -backend-config="address=${ADDRESS}" -backend-config="lock_address=${ADDRESS}/lock" -backend-config="unlock_address=${ADDRESS}/lock" -backend-config="username=<UseName>" -backend-config="password=$GITLAB_ACCESS_TOKEN" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
+  - terraform apply -auto-approve
+  cache:
+    key: ${CI_COMMIT_REF_NAME}
     paths:
-      - terraform.tfstate
-      - terraform.tfstate.backup
-      - .terraform/
-      - .terraform.lock.hcl
-  dependencies:
-    - docker_build
+    - ${TF_DIR}/.terraform
 
 # Deploy stage
 deploy:
@@ -119,14 +123,13 @@ cleanup:
   script:
     - sleep 600  # Wait for 10 Mins
     - terraform destroy -auto-approve
-  artifacts:
-    paths:
-      - terraform.tfstate
-      - terraform.tfstate.backup
-      - .terraform/
-      - .terraform.lock.hcl
   dependencies:
     - terraform_apply
+    - deploy
+  cache:
+    key: ${CI_COMMIT_REF_NAME}
+    paths:
+    - ${TF_DIR}/.terraform
   when: delayed
   start_in: 10 minutes
 
