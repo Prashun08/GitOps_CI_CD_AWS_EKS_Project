@@ -1,2 +1,4 @@
 Terraform/.terraform/
+Terraform/.*
+Terraform/terraform.*
 

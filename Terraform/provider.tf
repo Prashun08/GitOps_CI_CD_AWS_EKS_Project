@@ -6,7 +6,8 @@ terraform {
       version = "~> 3.27"
     }
   }
-  backend "http" {}
+  backend "http" {
+  }
 }
 provider "aws" {
   region = "us-east-1"

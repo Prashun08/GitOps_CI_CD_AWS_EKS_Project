@@ -87,6 +87,7 @@ terraform_apply:
     key: ${CI_COMMIT_REF_NAME}
     paths:
     - ${TF_DIR}/.terraform
+    policy: pull-push
 
 # Deploy stage
 deploy:
@@ -130,6 +131,7 @@ cleanup:
     key: ${CI_COMMIT_REF_NAME}
     paths:
     - ${TF_DIR}/.terraform
+    policy: pull
   when: delayed
   start_in: 10 minutes
 
