@@ -112,10 +112,19 @@ deploy:
     - aws eks update-kubeconfig --name eks-prod --region us-east-1
 
   script:
+
+    # Replace the placeholder with the actual Docker image tag
+    - sed -i "s|{{IMAGE_TAG}}|${CI_PIPELINE_IID}|g" kube-manifests/mongo-deployment.yaml
+    - sed -i "s|{{IMAGE_TAG}}|${CI_PIPELINE_IID}|g" kube-manifests/flask-deployment.yaml
+
+    # Apply the Kubernetes manifests
     - kubectl apply -f kube-manifests/mongo-deployment.yaml
     - kubectl apply -f kube-manifests/mongo-service.yaml
     - kubectl apply -f kube-manifests/flask-deployment.yaml
     - kubectl apply -f kube-manifests/flask-service.yaml
+
+    #Wait for 20s 
+    - sleep 20
     - kubectl get svc flask-service
   dependencies:
     - terraform_apply
@@ -127,7 +136,6 @@ cleanup:
     name: hashicorp/terraform:latest
     entrypoint: [""]
   script:
-    - sleep 600  # Wait for 10 Mins
     - terraform destroy -auto-approve
   dependencies:
     - terraform_apply
