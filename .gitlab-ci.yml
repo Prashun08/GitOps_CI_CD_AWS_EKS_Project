@@ -126,6 +126,10 @@ deploy:
     #Wait for 20s 
     - sleep 20
     - kubectl get svc flask-service
+
+    #Wait for 3m
+    - sleep 180
+    - kubectl delete svc flask-service
   dependencies:
     - terraform_apply
 
@@ -135,6 +139,11 @@ cleanup:
   image: 
     name: hashicorp/terraform:latest
     entrypoint: [""]
+  before_script:
+  - terraform --version
+  - export GITLAB_ACCESS_TOKEN=$TOKEN
+  - cd ${TF_DIR}
+  - terraform init  -reconfigure -backend-config="address=${ADDRESS}" -backend-config="lock_address=${ADDRESS}/lock" -backend-config="unlock_address=${ADDRESS}/lock" -backend-config="username=<UseName>" -backend-config="password=$GITLAB_ACCESS_TOKEN" -backend-config="lock_method=POST" -backend-config="unlock_method=DELETE" -backend-config="retry_wait_min=5"
   script:
     - terraform destroy -auto-approve
   dependencies:
@@ -146,7 +155,7 @@ cleanup:
     - ${TF_DIR}/.terraform
     policy: pull
   when: delayed
-  start_in: 10 minutes
+  start_in: 3 minutes
 
 
 
